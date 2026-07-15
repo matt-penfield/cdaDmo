@@ -70,26 +70,20 @@ body {
   font-size: 28px;
 }
 
-.nav-tabs {
-  display: flex;
-  gap: 4px;
-  margin-left: 24px;
-}
-
 .nav-tab {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
-  border: none;
+  padding: 10px 20px;
+  border: 2px solid var(--color-primary);
   background: none;
   font-family: var(--font);
   font-size: 14px;
-  font-weight: 500;
-  color: var(--color-text-secondary);
+  font-weight: 600;
+  color: var(--color-primary);
   cursor: pointer;
   border-radius: var(--radius-sm);
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
 }
 
 .nav-tab .material-symbols-outlined {
@@ -97,22 +91,30 @@ body {
 }
 
 .nav-tab:hover {
-  background: var(--color-bg);
-  color: var(--color-text);
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(59, 92, 204, 0.3);
 }
 
 .nav-tab.active {
   background: var(--color-primary);
   color: #fff;
+  box-shadow: 0 2px 8px rgba(59, 92, 204, 0.3);
 }
 
 .nav-user {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-left: auto;
   font-size: 14px;
   color: var(--color-text-secondary);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
 }
 
 .nav-user .material-symbols-outlined {
