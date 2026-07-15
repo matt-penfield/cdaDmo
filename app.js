@@ -572,9 +572,6 @@ function handleApprovalSubmit(e) {
 let activeDetailArtifactId = null;
 
 function bindDetailBack() {
-  document.getElementById('detail-back').addEventListener('click', () => {
-    showView('artifacts');
-  });
   document.getElementById('detail-review-btn').addEventListener('click', () => {
     if (activeDetailArtifactId) openModal(activeDetailArtifactId);
   });
