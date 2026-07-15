@@ -410,7 +410,6 @@ function renderArtifacts() {
         ${hasHistory ? `<button class="history-toggle" data-artifact-id="${escapeAttr(a.id)}"><span class="material-symbols-outlined">expand_more</span> ${artifactApprovals.length} approval${artifactApprovals.length > 1 ? 's' : ''}</button>` : ''}
       </td>
       <td>${formatDate(a.updated_at)}</td>
-      <td><button class="btn-approve" data-artifact-id="${escapeAttr(a.id)}">Review</button></td>
     `;
     artifactsBody.appendChild(tr);
 
@@ -420,7 +419,7 @@ function renderArtifacts() {
       historyTr.className = 'history-row hidden';
       historyTr.dataset.historyFor = a.id;
       historyTr.innerHTML = `
-        <td colspan="7">
+        <td colspan="6">
           <div class="inline-history">
             <div class="inline-history-title">Approval History</div>
             ${artifactApprovals.map(ap => `
@@ -455,17 +454,8 @@ function renderArtifacts() {
   // Bind row clicks to open detail view
   artifactsBody.querySelectorAll('tr[data-artifact-id]').forEach(tr => {
     tr.addEventListener('click', (e) => {
-      if (e.target.closest('.btn-approve')) return;
       if (e.target.closest('.history-toggle')) return;
       openDetailView(tr.dataset.artifactId);
-    });
-  });
-
-  // Bind approve buttons
-  artifactsBody.querySelectorAll('.btn-approve').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openModal(btn.dataset.artifactId);
     });
   });
 }
