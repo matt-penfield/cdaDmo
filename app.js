@@ -137,15 +137,51 @@ const MOCK_APPROVALS = [
   },
   {
     id: 'ap5', artifact_id: 'a6', approver_id: 'u2',
+    decision: 'Rejected',
+    reason: 'Sample size too small — 12 interviews is insufficient for 3 distinct segments. Need at least 5 per segment (15 total). Also missing competitive benchmarking data.',
+    decision_date: '2026-03-15', created_at: '2026-03-15'
+  },
+  {
+    id: 'ap5b', artifact_id: 'a6', approver_id: 'u2',
     decision: 'Approved',
-    reason: 'Research is thorough — 12 interviews across segments. Key insight on guest checkout friction is actionable.',
+    reason: 'Revised synthesis now includes 18 interviews (6 per segment) and competitive benchmark appendix. Guest checkout friction insight is actionable and well-supported.',
     decision_date: '2026-03-22', created_at: '2026-03-22'
   },
   {
     id: 'ap6', artifact_id: 'a8', approver_id: 'u1',
+    decision: 'Rejected',
+    reason: 'Wireframes do not account for accessibility requirements. Color contrast on primary CTA fails WCAG AA. Missing focus state indicators. Address form lacks error state designs.',
+    decision_date: '2026-04-05', created_at: '2026-04-05'
+  },
+  {
+    id: 'ap6b', artifact_id: 'a8', approver_id: 'u2',
+    decision: 'Rejected',
+    reason: 'Agree with Sarah\'s accessibility concerns. Additionally, the mobile breakpoint flow is missing — need to see responsive behavior before approval.',
+    decision_date: '2026-04-07', created_at: '2026-04-07'
+  },
+  {
+    id: 'ap6c', artifact_id: 'a8', approver_id: 'u1',
     decision: 'Approved with Conditions',
-    reason: 'Wireframes capture core flow well. Condition: address accessibility gaps flagged in review (color contrast on CTA, focus states) before moving to hi-fi.',
+    reason: 'v2 addresses accessibility gaps and adds mobile flow. Condition: validate with screen reader testing before hi-fi handoff. Approve to proceed to visual design.',
     decision_date: '2026-04-14', created_at: '2026-04-14'
+  },
+  {
+    id: 'ap6d', artifact_id: 'a8', approver_id: 'u2',
+    decision: 'Approved',
+    reason: 'Mobile flow looks good. Accessibility remediation is solid. Agree we can move forward to hi-fi with the screen reader testing condition noted.',
+    decision_date: '2026-04-15', created_at: '2026-04-15'
+  },
+  {
+    id: 'ap7', artifact_id: 'a3', approver_id: 'u1',
+    decision: 'Rejected',
+    reason: 'Q2 revenue came in 12% under target. Cannot approve loyalty integration in Q3 scope per the original condition. Roadmap needs revision to drop that workstream.',
+    decision_date: '2026-04-20', created_at: '2026-04-20'
+  },
+  {
+    id: 'ap7b', artifact_id: 'a3', approver_id: 'u1',
+    decision: 'Approved',
+    reason: 'Revised roadmap removes loyalty integration and reallocates capacity to payment method expansion. Approved for Q3 execution.',
+    decision_date: '2026-04-28', created_at: '2026-04-28'
   }
 ];
 
@@ -159,10 +195,8 @@ let currentView = 'artifacts';
 // ---- DOM refs ----
 
 const viewArtifacts = document.getElementById('view-artifacts');
-const viewHistory = document.getElementById('view-history');
 const viewDetail = document.getElementById('view-detail');
 const artifactsBody = document.querySelector('#artifacts-table tbody');
-const historyBody = document.querySelector('#history-table tbody');
 const modal = document.getElementById('approval-modal');
 const approvalForm = document.getElementById('approval-form');
 const userSelect = document.getElementById('current-user');
@@ -176,14 +210,12 @@ function init() {
   populateUserSelect();
   populatePhaseFilters();
   populateSourceFilters();
-  populateApproverFilter();
   bindNavTabs();
   bindFilters();
   bindSort();
   bindModal();
   bindDetailBack();
   renderArtifacts();
-  renderHistory();
   // Default to detail view with first artifact
   openDetailView(artifacts[0].id);
 }
@@ -206,14 +238,12 @@ function populateUserSelect() {
 // ---- Populate filter dropdowns ----
 
 function populatePhaseFilters() {
-  ['filter-phase', 'history-filter-phase'].forEach(id => {
-    const sel = document.getElementById(id);
-    PHASES.forEach(p => {
-      const opt = document.createElement('option');
-      opt.value = p;
-      opt.textContent = p;
-      sel.appendChild(opt);
-    });
+  const sel = document.getElementById('filter-phase');
+  PHASES.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p;
+    opt.textContent = p;
+    sel.appendChild(opt);
   });
 }
 
@@ -228,16 +258,6 @@ function populateSourceFilters() {
   });
 }
 
-function populateApproverFilter() {
-  const sel = document.getElementById('history-filter-approver');
-  USERS.filter(u => u.role === 'Approver').forEach(u => {
-    const opt = document.createElement('option');
-    opt.value = u.id;
-    opt.textContent = u.name;
-    sel.appendChild(opt);
-  });
-}
-
 // ---- Navigation ----
 
 function bindNavTabs() {
@@ -248,7 +268,6 @@ function bindNavTabs() {
       const view = tab.dataset.view;
       currentView = view;
       viewArtifacts.classList.toggle('active', view === 'artifacts');
-      viewHistory.classList.toggle('active', view === 'history');
       viewDetail.classList.remove('active');
     });
   });
@@ -256,7 +275,6 @@ function bindNavTabs() {
 
 function showView(viewName) {
   viewArtifacts.classList.toggle('active', viewName === 'artifacts');
-  viewHistory.classList.toggle('active', viewName === 'history');
   viewDetail.classList.toggle('active', viewName === 'detail');
   // Update nav tab highlights
   document.querySelectorAll('.nav-tab').forEach(t => {
@@ -274,9 +292,6 @@ function bindFilters() {
   document.getElementById('filter-phase').addEventListener('change', renderArtifacts);
   document.getElementById('filter-status').addEventListener('change', renderArtifacts);
   document.getElementById('filter-source').addEventListener('change', renderArtifacts);
-  document.getElementById('history-filter-phase').addEventListener('change', renderHistory);
-  document.getElementById('history-filter-decision').addEventListener('change', renderHistory);
-  document.getElementById('history-filter-approver').addEventListener('change', renderHistory);
 }
 
 function getFilteredArtifacts() {
@@ -290,24 +305,13 @@ function getFilteredArtifacts() {
   );
 }
 
-function getFilteredApprovals() {
-  const phase = document.getElementById('history-filter-phase').value;
-  const decision = document.getElementById('history-filter-decision').value;
-  const approver = document.getElementById('history-filter-approver').value;
-  return approvals.filter(ap => {
-    const artifact = artifacts.find(a => a.id === ap.artifact_id);
-    return (
-      (!phase || (artifact && artifact.phase === phase)) &&
-      (!decision || ap.decision === decision) &&
-      (!approver || ap.approver_id === approver)
-    );
-  });
+function getApprovalsForArtifact(artifactId) {
+  return approvals.filter(ap => ap.artifact_id === artifactId);
 }
 
 // ---- Sorting ----
 
 let artifactSort = { key: 'updated_at', dir: -1 };
-let historySort = { key: 'date', dir: -1 };
 
 function bindSort() {
   document.querySelectorAll('#artifacts-table thead th[data-sort]').forEach(th => {
@@ -320,19 +324,6 @@ function bindSort() {
       }
       updateSortIcons('#artifacts-table', key, artifactSort.dir);
       renderArtifacts();
-    });
-  });
-
-  document.querySelectorAll('#history-table thead th[data-sort]').forEach(th => {
-    th.addEventListener('click', () => {
-      const key = th.dataset.sort;
-      if (historySort.key === key) {
-        historySort.dir *= -1;
-      } else {
-        historySort = { key, dir: 1 };
-      }
-      updateSortIcons('#history-table', key, historySort.dir);
-      renderHistory();
     });
   });
 }
@@ -359,37 +350,6 @@ function sortArtifacts(list) {
     if (key === 'contributor') {
       va = getUserName(a.contributor_id);
       vb = getUserName(b.contributor_id);
-    } else {
-      va = a[key] || '';
-      vb = b[key] || '';
-    }
-    if (va < vb) return -1 * dir;
-    if (va > vb) return 1 * dir;
-    return 0;
-  });
-}
-
-function sortApprovals(list) {
-  const key = historySort.key;
-  const dir = historySort.dir;
-  return [...list].sort((a, b) => {
-    let va, vb;
-    if (key === 'artifact') {
-      const artA = artifacts.find(x => x.id === a.artifact_id);
-      const artB = artifacts.find(x => x.id === b.artifact_id);
-      va = artA ? artA.name : '';
-      vb = artB ? artB.name : '';
-    } else if (key === 'phase') {
-      const artA = artifacts.find(x => x.id === a.artifact_id);
-      const artB = artifacts.find(x => x.id === b.artifact_id);
-      va = artA ? artA.phase : '';
-      vb = artB ? artB.phase : '';
-    } else if (key === 'approver') {
-      va = getUserName(a.approver_id);
-      vb = getUserName(b.approver_id);
-    } else if (key === 'date') {
-      va = a.decision_date;
-      vb = b.decision_date;
     } else {
       va = a[key] || '';
       vb = b[key] || '';
@@ -435,6 +395,8 @@ function renderArtifacts() {
   }
 
   filtered.forEach(a => {
+    const artifactApprovals = getApprovalsForArtifact(a.id);
+    const hasHistory = artifactApprovals.length > 0;
     const tr = document.createElement('tr');
     tr.dataset.artifactId = a.id;
     tr.style.cursor = 'pointer';
@@ -443,18 +405,58 @@ function renderArtifacts() {
       <td><span class="source-label">${escapeHtml(a.source_app)}</span></td>
       <td><span class="phase-tag">${escapeHtml(a.phase)}</span></td>
       <td>${escapeHtml(getUserName(a.contributor_id))}</td>
-      <td><span class="status-badge ${statusBadgeClass(a.status)}">${escapeHtml(a.status)}</span></td>
+      <td>
+        <span class="status-badge ${statusBadgeClass(a.status)}">${escapeHtml(a.status)}</span>
+        ${hasHistory ? `<button class="history-toggle" data-artifact-id="${escapeAttr(a.id)}"><span class="material-symbols-outlined">expand_more</span> ${artifactApprovals.length} approval${artifactApprovals.length > 1 ? 's' : ''}</button>` : ''}
+      </td>
       <td>${formatDate(a.updated_at)}</td>
       <td><button class="btn-approve" data-artifact-id="${escapeAttr(a.id)}">Review</button></td>
     `;
     artifactsBody.appendChild(tr);
+
+    // Add hidden history row
+    if (hasHistory) {
+      const historyTr = document.createElement('tr');
+      historyTr.className = 'history-row hidden';
+      historyTr.dataset.historyFor = a.id;
+      historyTr.innerHTML = `
+        <td colspan="7">
+          <div class="inline-history">
+            <div class="inline-history-title">Approval History</div>
+            ${artifactApprovals.map(ap => `
+              <div class="inline-history-entry">
+                <span class="status-badge ${statusBadgeClass(ap.decision)}">${escapeHtml(ap.decision)}</span>
+                <span class="inline-history-approver">${escapeHtml(getUserName(ap.approver_id))}</span>
+                <span class="inline-history-date">${formatDate(ap.decision_date)}</span>
+                <span class="inline-history-reason">${escapeHtml(ap.reason)}</span>
+              </div>
+            `).join('')}
+          </div>
+        </td>
+      `;
+      artifactsBody.appendChild(historyTr);
+    }
+  });
+
+  // Bind history toggles
+  artifactsBody.querySelectorAll('.history-toggle').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const artifactId = btn.dataset.artifactId;
+      const historyRow = artifactsBody.querySelector(`tr[data-history-for="${artifactId}"]`);
+      if (historyRow) {
+        historyRow.classList.toggle('hidden');
+        const icon = btn.querySelector('.material-symbols-outlined');
+        icon.textContent = historyRow.classList.contains('hidden') ? 'expand_more' : 'expand_less';
+      }
+    });
   });
 
   // Bind row clicks to open detail view
   artifactsBody.querySelectorAll('tr[data-artifact-id]').forEach(tr => {
     tr.addEventListener('click', (e) => {
-      // Don't navigate if they clicked the Review button
       if (e.target.closest('.btn-approve')) return;
+      if (e.target.closest('.history-toggle')) return;
       openDetailView(tr.dataset.artifactId);
     });
   });
@@ -465,41 +467,6 @@ function renderArtifacts() {
       e.stopPropagation();
       openModal(btn.dataset.artifactId);
     });
-  });
-}
-
-function renderHistory() {
-  const filtered = sortApprovals(getFilteredApprovals());
-  historyBody.innerHTML = '';
-
-  if (filtered.length === 0) {
-    historyBody.innerHTML = `
-      <tr><td colspan="6">
-        <div class="empty-state">
-          <span class="material-symbols-outlined">history_toggle_off</span>
-          No approval records match the current filters.
-        </div>
-      </td></tr>`;
-    return;
-  }
-
-  filtered.forEach(ap => {
-    const artifact = artifacts.find(a => a.id === ap.artifact_id);
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><a class="artifact-link" href="${escapeAttr(artifact ? artifact.source_url : '#')}" target="_blank" rel="noopener">${escapeHtml(artifact ? artifact.name : 'Unknown')}</a></td>
-      <td><span class="phase-tag">${escapeHtml(artifact ? artifact.phase : '')}</span></td>
-      <td><span class="status-badge ${statusBadgeClass(ap.decision)}">${escapeHtml(ap.decision)}</span></td>
-      <td>${escapeHtml(getUserName(ap.approver_id))}</td>
-      <td class="reason-cell"><span class="reason-text">${escapeHtml(ap.reason)}</span></td>
-      <td>${formatDate(ap.decision_date)}</td>
-    `;
-    historyBody.appendChild(tr);
-  });
-
-  // Bind reason expand/collapse
-  historyBody.querySelectorAll('.reason-text').forEach(el => {
-    el.addEventListener('click', () => el.classList.toggle('expanded'));
   });
 }
 
@@ -566,7 +533,6 @@ function handleApprovalSubmit(e) {
 
   closeModal();
   renderArtifacts();
-  renderHistory();
 }
 
 // ---- Detail View (Single Pane of Glass) ----

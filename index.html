@@ -19,11 +19,7 @@
     <div class="nav-tabs">
       <button class="nav-tab active" data-view="artifacts">
         <span class="material-symbols-outlined">description</span>
-        Artifacts
-      </button>
-      <button class="nav-tab" data-view="history">
-        <span class="material-symbols-outlined">history</span>
-        Approval History
+        Review History
       </button>
     </div>
     <div class="nav-user">
@@ -63,42 +59,6 @@
             <th data-sort="status">Status <span class="material-symbols-outlined sort-icon">unfold_more</span></th>
             <th data-sort="updated_at">Updated <span class="material-symbols-outlined sort-icon">unfold_more</span></th>
             <th>Action</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </main>
-
-  <!-- Approval History View -->
-  <main id="view-history" class="view">
-    <header class="view-header">
-      <h1>Approval History</h1>
-      <div class="filters">
-        <select id="history-filter-phase">
-          <option value="">All Phases</option>
-        </select>
-        <select id="history-filter-decision">
-          <option value="">All Decisions</option>
-          <option value="Approved">Approved</option>
-          <option value="Approved with Conditions">Approved with Conditions</option>
-          <option value="Rejected">Rejected</option>
-        </select>
-        <select id="history-filter-approver">
-          <option value="">All Approvers</option>
-        </select>
-      </div>
-    </header>
-    <div class="table-wrapper">
-      <table id="history-table">
-        <thead>
-          <tr>
-            <th data-sort="artifact">Artifact <span class="material-symbols-outlined sort-icon">unfold_more</span></th>
-            <th data-sort="phase">Phase <span class="material-symbols-outlined sort-icon">unfold_more</span></th>
-            <th data-sort="decision">Decision <span class="material-symbols-outlined sort-icon">unfold_more</span></th>
-            <th data-sort="approver">Approver <span class="material-symbols-outlined sort-icon">unfold_more</span></th>
-            <th>Reason</th>
-            <th data-sort="date">Date <span class="material-symbols-outlined sort-icon">unfold_more</span></th>
           </tr>
         </thead>
         <tbody></tbody>
