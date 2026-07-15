@@ -184,6 +184,8 @@ function init() {
   bindDetailBack();
   renderArtifacts();
   renderHistory();
+  // Default to detail view with first artifact
+  openDetailView(artifacts[0].id);
 }
 
 // ---- User selector ----
@@ -846,78 +848,308 @@ function mockPrototype(a) {
 
 function mockDesignSpec(a) {
   return `
-    <div class="mock-doc">
-      <div class="doc-meta">
-        <span><span class="material-symbols-outlined">person</span> ${escapeHtml(getUserName(a.contributor_id))}</span>
-        <span><span class="material-symbols-outlined">calendar_today</span> ${formatDate(a.created_at)}</span>
-        <span><span class="material-symbols-outlined">design_services</span> Design Tool</span>
+    <div class="mock-figma">
+      <div class="figma-toolbar">
+        <div class="figma-toolbar-left">
+          <div class="figma-logo">
+            <svg width="12" height="18" viewBox="0 0 38 57" fill="none"><path d="M19 28.5a9.5 9.5 0 1 1 19 0 9.5 9.5 0 0 1-19 0z" fill="#1abcfe"/><path d="M0 47.5A9.5 9.5 0 0 1 9.5 38H19v9.5a9.5 9.5 0 0 1-19 0z" fill="#0acf83"/><path d="M19 0v19h9.5a9.5 9.5 0 0 0 0-19H19z" fill="#ff7262"/><path d="M0 9.5A9.5 9.5 0 0 0 9.5 19H19V0H9.5A9.5 9.5 0 0 0 0 9.5z" fill="#f24e1e"/><path d="M0 28.5A9.5 9.5 0 0 0 9.5 38H19V19H9.5A9.5 9.5 0 0 0 0 28.5z" fill="#a259ff"/></svg>
+          </div>
+          <span class="figma-filename">${escapeHtml(a.name)}</span>
+        </div>
+        <div class="figma-toolbar-center">
+          <span class="figma-tool active"><span class="material-symbols-outlined">arrow_selector_tool</span></span>
+          <span class="figma-tool"><span class="material-symbols-outlined">frame_inspect</span></span>
+          <span class="figma-tool"><span class="material-symbols-outlined">square</span></span>
+          <span class="figma-tool"><span class="material-symbols-outlined">edit</span></span>
+          <span class="figma-tool"><span class="material-symbols-outlined">text_fields</span></span>
+        </div>
+        <div class="figma-toolbar-right">
+          <span class="figma-avatar">JO</span>
+          <span class="figma-share">Share</span>
+        </div>
       </div>
-      <h2>Design Spec — Payment Step</h2>
-      <h3>Layout</h3>
-      <p>Two-column layout: payment form (left, 60%) and order summary (right, 40%). Collapses to single column on mobile (&lt;768px).</p>
-      <h3>Typography</h3>
-      <ul>
-        <li>Section headers: Inter 600, 18px, #1a1d23</li>
-        <li>Field labels: Inter 500, 14px, #5f6672</li>
-        <li>Input text: Inter 400, 16px, #1a1d23</li>
-      </ul>
-      <h3>Spacing</h3>
-      <ul>
-        <li>Form fields: 16px vertical gap</li>
-        <li>Section padding: 32px</li>
-        <li>CTA button: full-width on mobile, 200px fixed on desktop</li>
-      </ul>
-      <h3>States</h3>
-      <p>Field focus: 2px primary border + 4px shadow ring. Error: red border + inline message below field. Disabled: 50% opacity, no pointer events.</p>
+      <div class="figma-canvas">
+        <div class="figma-layers-panel">
+          <div class="figma-panel-title">Layers</div>
+          <div class="figma-layer indent-0 active">↳ Payment Step</div>
+          <div class="figma-layer indent-1">Header</div>
+          <div class="figma-layer indent-1">Step Indicator</div>
+          <div class="figma-layer indent-1 active">Form Container</div>
+          <div class="figma-layer indent-2">Card Number Input</div>
+          <div class="figma-layer indent-2">Expiry / CVV Row</div>
+          <div class="figma-layer indent-2">Billing Address</div>
+          <div class="figma-layer indent-1">Order Summary</div>
+          <div class="figma-layer indent-1">CTA Button</div>
+        </div>
+        <div class="figma-artboard-area">
+          <div class="figma-frame-label">Payment Step — Desktop (1440×900)</div>
+          <div class="figma-artboard">
+            <div class="figma-screen-header">
+              <div class="figma-screen-logo"></div>
+              <div class="figma-screen-nav"><div></div><div></div><div></div></div>
+            </div>
+            <div class="figma-step-indicator">
+              <div class="figma-step done">1 Shipping</div>
+              <div class="figma-step-line"></div>
+              <div class="figma-step current">2 Payment</div>
+              <div class="figma-step-line dim"></div>
+              <div class="figma-step dim">3 Confirm</div>
+            </div>
+            <div class="figma-two-col">
+              <div class="figma-form-col">
+                <div class="figma-section-title">Payment Method</div>
+                <div class="figma-input-group">
+                  <label>Card Number</label>
+                  <div class="figma-input"><span>4242 •••• •••• 1234</span><span class="figma-card-icon">💳</span></div>
+                </div>
+                <div class="figma-input-row">
+                  <div class="figma-input-group half">
+                    <label>Expiry</label>
+                    <div class="figma-input">09 / 28</div>
+                  </div>
+                  <div class="figma-input-group half">
+                    <label>CVV</label>
+                    <div class="figma-input">•••</div>
+                  </div>
+                </div>
+                <div class="figma-input-group">
+                  <label>Billing Address</label>
+                  <div class="figma-input">123 Main St, Apt 4B</div>
+                </div>
+                <div class="figma-input-group">
+                  <label></label>
+                  <div class="figma-input">New York, NY 10001</div>
+                </div>
+                <div class="figma-cta-btn">Continue to Review</div>
+              </div>
+              <div class="figma-summary-col">
+                <div class="figma-section-title">Order Summary</div>
+                <div class="figma-summary-row"><span>Wireless Headphones</span><span>$89.99</span></div>
+                <div class="figma-summary-row"><span>USB-C Cable (x2)</span><span>$14.00</span></div>
+                <div class="figma-summary-row"><span>Shipping</span><span>Free</span></div>
+                <div class="figma-summary-divider"></div>
+                <div class="figma-summary-row total"><span>Total</span><span>$103.99</span></div>
+                <div class="figma-trust-signals">
+                  <span>🔒 Secure checkout</span>
+                  <span>↩ Free returns</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="figma-inspect-panel">
+          <div class="figma-panel-title">Inspect</div>
+          <div class="figma-inspect-section">
+            <div class="figma-inspect-label">Frame</div>
+            <div class="figma-inspect-value">W: 1440 H: 900</div>
+          </div>
+          <div class="figma-inspect-section">
+            <div class="figma-inspect-label">Fill</div>
+            <div class="figma-inspect-swatch" style="background:#ffffff"></div>
+            <div class="figma-inspect-value">#FFFFFF</div>
+          </div>
+          <div class="figma-inspect-section">
+            <div class="figma-inspect-label">Font</div>
+            <div class="figma-inspect-value">Inter 600 / 18px</div>
+          </div>
+          <div class="figma-inspect-section">
+            <div class="figma-inspect-label">Spacing</div>
+            <div class="figma-inspect-value">16px gap</div>
+          </div>
+        </div>
+      </div>
     </div>`;
 }
 
 function mockComponentDocs(a) {
   return `
-    <div class="mock-doc">
-      <div class="doc-meta">
-        <span><span class="material-symbols-outlined">person</span> ${escapeHtml(getUserName(a.contributor_id))}</span>
-        <span><span class="material-symbols-outlined">calendar_today</span> ${formatDate(a.created_at)}</span>
-        <span><span class="material-symbols-outlined">design_services</span> Design Tool</span>
+    <div class="mock-figma">
+      <div class="figma-toolbar">
+        <div class="figma-toolbar-left">
+          <div class="figma-logo">
+            <svg width="12" height="18" viewBox="0 0 38 57" fill="none"><path d="M19 28.5a9.5 9.5 0 1 1 19 0 9.5 9.5 0 0 1-19 0z" fill="#1abcfe"/><path d="M0 47.5A9.5 9.5 0 0 1 9.5 38H19v9.5a9.5 9.5 0 0 1-19 0z" fill="#0acf83"/><path d="M19 0v19h9.5a9.5 9.5 0 0 0 0-19H19z" fill="#ff7262"/><path d="M0 9.5A9.5 9.5 0 0 0 9.5 19H19V0H9.5A9.5 9.5 0 0 0 0 9.5z" fill="#f24e1e"/><path d="M0 28.5A9.5 9.5 0 0 0 9.5 38H19V19H9.5A9.5 9.5 0 0 0 0 28.5z" fill="#a259ff"/></svg>
+          </div>
+          <span class="figma-filename">${escapeHtml(a.name)}</span>
+        </div>
+        <div class="figma-toolbar-center">
+          <span class="figma-tool active"><span class="material-symbols-outlined">arrow_selector_tool</span></span>
+          <span class="figma-tool"><span class="material-symbols-outlined">frame_inspect</span></span>
+          <span class="figma-tool"><span class="material-symbols-outlined">square</span></span>
+          <span class="figma-tool"><span class="material-symbols-outlined">edit</span></span>
+          <span class="figma-tool"><span class="material-symbols-outlined">text_fields</span></span>
+        </div>
+        <div class="figma-toolbar-right">
+          <span class="figma-avatar">JO</span>
+          <span class="figma-share">Share</span>
+        </div>
       </div>
-      <h2>Component Docs — Form Inputs</h2>
-      <h3>Text Input</h3>
-      <p>Height: 44px. Border-radius: 8px. Padding: 12px 16px. Border: 1px solid #e2e5ea. Includes label (above) and optional helper text (below).</p>
-      <h3>Select Dropdown</h3>
-      <p>Same dimensions as text input. Chevron icon right-aligned. Options panel: max-height 240px, scrollable, 8px border-radius.</p>
-      <h3>Variants</h3>
-      <ul>
-        <li><strong>Default:</strong> Grey border, white background</li>
-        <li><strong>Focused:</strong> Primary blue border, light blue shadow ring</li>
-        <li><strong>Error:</strong> Red border, red helper text, error icon</li>
-        <li><strong>Disabled:</strong> Grey background (#f5f6f8), no interaction</li>
-      </ul>
+      <div class="figma-canvas">
+        <div class="figma-layers-panel">
+          <div class="figma-panel-title">Components</div>
+          <div class="figma-layer indent-0 active">↳ Form Inputs</div>
+          <div class="figma-layer indent-1">Text Input / Default</div>
+          <div class="figma-layer indent-1">Text Input / Focused</div>
+          <div class="figma-layer indent-1">Text Input / Error</div>
+          <div class="figma-layer indent-1">Text Input / Disabled</div>
+          <div class="figma-layer indent-1">Select / Default</div>
+          <div class="figma-layer indent-1">Select / Open</div>
+        </div>
+        <div class="figma-artboard-area">
+          <div class="figma-frame-label">Component Docs — Form Inputs</div>
+          <div class="figma-artboard components">
+            <div class="figma-component-grid">
+              <div class="figma-component-card">
+                <div class="figma-comp-label">Text Input / Default</div>
+                <div class="figma-comp-preview">
+                  <label>Email address</label>
+                  <div class="figma-input">user@example.com</div>
+                </div>
+                <div class="figma-comp-specs">H: 44px · R: 8px · Border: #E2E5EA</div>
+              </div>
+              <div class="figma-component-card">
+                <div class="figma-comp-label">Text Input / Focused</div>
+                <div class="figma-comp-preview">
+                  <label>Email address</label>
+                  <div class="figma-input focused">user@example.com</div>
+                </div>
+                <div class="figma-comp-specs">Border: #3B5CCC · Shadow: 0 0 0 3px rgba(59,92,204,0.12)</div>
+              </div>
+              <div class="figma-component-card">
+                <div class="figma-comp-label">Text Input / Error</div>
+                <div class="figma-comp-preview">
+                  <label>Email address</label>
+                  <div class="figma-input error">invalid-email</div>
+                  <div class="figma-input-helper error">Please enter a valid email</div>
+                </div>
+                <div class="figma-comp-specs">Border: #C43131 · Helper: 12px #C43131</div>
+              </div>
+              <div class="figma-component-card">
+                <div class="figma-comp-label">Text Input / Disabled</div>
+                <div class="figma-comp-preview">
+                  <label>Email address</label>
+                  <div class="figma-input disabled">user@example.com</div>
+                </div>
+                <div class="figma-comp-specs">BG: #F5F6F8 · Opacity: 0.5 · No pointer</div>
+              </div>
+              <div class="figma-component-card">
+                <div class="figma-comp-label">Select / Default</div>
+                <div class="figma-comp-preview">
+                  <label>Country</label>
+                  <div class="figma-input select">United States <span class="figma-chevron">▾</span></div>
+                </div>
+                <div class="figma-comp-specs">Same dims as text · Chevron right-aligned</div>
+              </div>
+              <div class="figma-component-card">
+                <div class="figma-comp-label">Select / Open</div>
+                <div class="figma-comp-preview">
+                  <label>Country</label>
+                  <div class="figma-input select focused">United States <span class="figma-chevron">▴</span></div>
+                  <div class="figma-dropdown-preview">
+                    <div class="figma-dropdown-item selected">United States</div>
+                    <div class="figma-dropdown-item">Canada</div>
+                    <div class="figma-dropdown-item">United Kingdom</div>
+                  </div>
+                </div>
+                <div class="figma-comp-specs">Max-H: 240px · Scrollable · R: 8px</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="figma-inspect-panel">
+          <div class="figma-panel-title">Design</div>
+          <div class="figma-inspect-section">
+            <div class="figma-inspect-label">Auto Layout</div>
+            <div class="figma-inspect-value">Vertical, 16px gap</div>
+          </div>
+          <div class="figma-inspect-section">
+            <div class="figma-inspect-label">Fill</div>
+            <div class="figma-inspect-swatch" style="background:#ffffff"></div>
+            <div class="figma-inspect-value">#FFFFFF</div>
+          </div>
+          <div class="figma-inspect-section">
+            <div class="figma-inspect-label">Stroke</div>
+            <div class="figma-inspect-swatch" style="background:#e2e5ea"></div>
+            <div class="figma-inspect-value">1px #E2E5EA</div>
+          </div>
+          <div class="figma-inspect-section">
+            <div class="figma-inspect-label">Radius</div>
+            <div class="figma-inspect-value">8px all</div>
+          </div>
+        </div>
+      </div>
     </div>`;
 }
 
 function mockStagingEnv(a) {
   return `
-    <div class="mock-doc">
-      <div class="doc-meta">
-        <span><span class="material-symbols-outlined">person</span> ${escapeHtml(getUserName(a.contributor_id))}</span>
-        <span><span class="material-symbols-outlined">calendar_today</span> ${formatDate(a.created_at)}</span>
-        <span><span class="material-symbols-outlined">code</span> Dev Environment</span>
+    <div class="mock-staging">
+      <div class="staging-browser-chrome">
+        <div class="staging-chrome-dots"><span></span><span></span><span></span></div>
+        <div class="staging-chrome-bar">
+          <span class="staging-lock">🔒</span>
+          <span class="staging-url">https://staging.checkout-v2.internal.dev</span>
+        </div>
+        <div class="staging-chrome-actions">
+          <span class="staging-devtools-badge">DevTools</span>
+        </div>
       </div>
-      <h2>Staging Environment — Checkout v2</h2>
-      <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:16px;">Branch: <code>feature/checkout-v2</code> · Build #247 · Deployed Jun 1</p>
-    </div>
-    <div class="mock-dev" style="margin-top:20px">
-      <span class="dev-comment">// Checkout v2 — staging deployment</span><br>
-      <span class="dev-comment">// https://staging.example.com/checkout-v2</span><br><br>
-      <span class="dev-keyword">export default</span> <span class="dev-fn">function</span> <span class="dev-fn">CheckoutPage</span>() {<br>
-      &nbsp;&nbsp;<span class="dev-keyword">return</span> (<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;<span class="dev-tag">&lt;CheckoutLayout&gt;</span><br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dev-tag">&lt;StepIndicator</span> current={<span class="dev-string">2</span>} total={<span class="dev-string">3</span>} <span class="dev-tag">/&gt;</span><br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dev-tag">&lt;PaymentForm</span> <span class="dev-tag">/&gt;</span><br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dev-tag">&lt;OrderSummary</span> <span class="dev-tag">/&gt;</span><br>
-      &nbsp;&nbsp;&nbsp;&nbsp;<span class="dev-tag">&lt;/CheckoutLayout&gt;</span><br>
-      &nbsp;&nbsp;);<br>
-      }<br>
+      <div class="staging-env-banner">
+        <span>⚠️ STAGING ENVIRONMENT</span>
+        <span>Branch: feature/checkout-v2 · Build #247 · Deployed Jun 1, 2026</span>
+      </div>
+      <div class="staging-page">
+        <div class="staging-page-header">
+          <div class="staging-page-logo"></div>
+          <div class="staging-page-nav"><div></div><div></div><div></div><div class="staging-cart-icon">🛒 2</div></div>
+        </div>
+        <div class="staging-step-indicator">
+          <div class="staging-step done"><span class="staging-step-num">✓</span> Shipping</div>
+          <div class="staging-step-connector done"></div>
+          <div class="staging-step current"><span class="staging-step-num">2</span> Payment</div>
+          <div class="staging-step-connector"></div>
+          <div class="staging-step"><span class="staging-step-num">3</span> Confirm</div>
+        </div>
+        <div class="staging-two-col">
+          <div class="staging-form-col">
+            <div class="staging-form-title">Payment Method</div>
+            <div class="staging-field">
+              <label>Card Number</label>
+              <div class="staging-input"><span>4242 •••• •••• 1234</span><span>💳</span></div>
+            </div>
+            <div class="staging-field-row">
+              <div class="staging-field half">
+                <label>Expiry</label>
+                <div class="staging-input">09 / 28</div>
+              </div>
+              <div class="staging-field half">
+                <label>CVV</label>
+                <div class="staging-input">•••</div>
+              </div>
+            </div>
+            <div class="staging-field">
+              <label>Billing Address</label>
+              <div class="staging-input">123 Main St, Apt 4B</div>
+            </div>
+            <div class="staging-field">
+              <label></label>
+              <div class="staging-input">New York, NY 10001</div>
+            </div>
+            <button class="staging-cta">Continue to Review</button>
+          </div>
+          <div class="staging-summary-col">
+            <div class="staging-form-title">Order Summary</div>
+            <div class="staging-line-item"><span>Wireless Headphones</span><span>$89.99</span></div>
+            <div class="staging-line-item"><span>USB-C Cable (x2)</span><span>$14.00</span></div>
+            <div class="staging-line-item"><span>Shipping</span><span>Free</span></div>
+            <div class="staging-divider"></div>
+            <div class="staging-line-item total"><span>Total</span><span>$103.99</span></div>
+            <div class="staging-trust">
+              <span>🔒 Secure checkout</span>
+              <span>↩ Free returns</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>`;
 }
 
